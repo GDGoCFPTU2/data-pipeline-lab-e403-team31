@@ -25,9 +25,20 @@ def run_pipeline():
             raw_data = json.load(f)
         
         # TODO: Bước 1: Gọi hàm xử lý PDF (process_pdf_data)
-        
-        # TODO: Bước 2: Kiểm tra chất lượng (run_semantic_checks). 
+        processed = process_pdf_data(raw_data)
+
+        # TODO: Bước 2: Kiểm tra chất lượng (run_semantic_checks).
         # Nếu đạt (True) thì thêm vào list final_kb
+        ok = run_semantic_checks(processed)
+        if ok:
+            try:
+                # Validate/normalize with Pydantic schema before appending
+                doc = UnifiedDocument(**processed)
+                final_kb.append(doc.dict())
+            except Exception as e:
+                print(f"Validation failed for {file_path}: {e}")
+        else:
+            print(f"Quality check failed for {file_path}; skipping.")
 
     # Xử lý Group B (Videos)
     video_files = glob.glob(os.path.join(RAW_DATA_DIR, "group_b_videos", "*.json"))
@@ -35,7 +46,17 @@ def run_pipeline():
         with open(file_path, 'r') as f:
             raw_data = json.load(f)
         
-        # TODO: Làm tương tự như phần PDF (gọi hàm xử lý Video và kiểm tra chất lượng)
+        # Làm tương tự như phần PDF (gọi hàm xử lý Video và kiểm tra chất lượng)
+        processed = process_video_data(raw_data)
+        ok = run_semantic_checks(processed)
+        if ok:
+            try:
+                doc = UnifiedDocument(**processed)
+                final_kb.append(doc.dict())
+            except Exception as e:
+                print(f"Validation failed for {file_path}: {e}")
+        else:
+            print(f"Quality check failed for {file_path}; skipping.")
 
     # Lưu kết quả
     with open(OUTPUT_FILE, 'w') as f:

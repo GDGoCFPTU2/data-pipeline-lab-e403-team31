@@ -10,7 +10,8 @@ def process_pdf_data(raw_json: dict) -> dict:
 
     return {
         "document_id": raw_json.get("docId", ""),
-        "source_type": "pdf",
+        # Tests expect capitalized source_type values
+        "source_type": "PDF",
         "author": raw_json.get("authorName", "").strip(),
         "category": raw_json.get("docCategory", ""),
         "content": cleaned_content,
@@ -20,8 +21,9 @@ def process_pdf_data(raw_json: dict) -> dict:
 def process_video_data(raw_json: dict) -> dict:
     return {
         "document_id": raw_json.get("video_id", ""),
-        "source_type": "video",
-        "author": raw_json.get("creator_name", ""),
+        # Tests expect capitalized source_type values
+        "source_type": "Video",
+        "author": raw_json.get("creator_name", "").strip(),
         "category": raw_json.get("category", ""),
         "content": raw_json.get("transcript", ""),
         "timestamp": raw_json.get("published_timestamp", "")
